@@ -44,6 +44,7 @@ final class FileAttenteController extends Controller
         $fileAttente = new FileAttente([
             'position' => $lastPosition + 1,
             'date_demande' => now(),
+            'user_id' => Auth::id(),
         ]);
         
         Auth::user()->fileAttente()->save($fileAttente);

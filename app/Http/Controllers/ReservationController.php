@@ -12,6 +12,7 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Carbon\Carbon;
 
 final class ReservationController extends Controller
@@ -84,7 +85,7 @@ final class ReservationController extends Controller
         
         // Calculer les dates de début et de fin
         $dateDebut = now();
-        $dateFin = $dateDebut->copy()->addDays($validated['duration']);
+        $dateFin = $dateDebut->copy()->addDays((int)$validated['duration']);
         
         // Créer la réservation dans une transaction
         DB::transaction(function () use ($place, $dateDebut, $dateFin) {
@@ -113,7 +114,9 @@ final class ReservationController extends Controller
     public function show(Reservation $reservation): View
     {
         // Vérifier que l'utilisateur est propriétaire de la réservation
-        $this->authorize('view', $reservation);
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403, 'Vous n\'êtes pas autorisé à voir cette réservation.');
+        }
         
         return view('reservations.show', compact('reservation'));
     }
@@ -124,7 +127,9 @@ final class ReservationController extends Controller
     public function edit(Reservation $reservation): View
     {
         // Vérifier que l'utilisateur est propriétaire de la réservation
-        $this->authorize('update', $reservation);
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403, 'Vous n\'êtes pas autorisé à modifier cette réservation.');
+        }
         
         $places = Place::all();
         
@@ -156,7 +161,9 @@ final class ReservationController extends Controller
     public function destroy(Reservation $reservation): RedirectResponse
     {
         // Vérifier que l'utilisateur est propriétaire de la réservation
-        $this->authorize('delete', $reservation);
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403, 'Vous n\'êtes pas autorisé à annuler cette réservation.');
+        }
         
         DB::transaction(function () use ($reservation) {
             // Libérer la place
