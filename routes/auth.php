@@ -14,6 +14,16 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [UtilisateurController::class, 'showLoginForm'])
                 ->name('login');
     Route::post('login', [UtilisateurController::class, 'login']);
+                
+    // Mot de passe oublié
+    Route::get('forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'showForgotForm'])
+                ->name('password.request');
+    Route::post('forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLink'])
+                ->name('password.email');
+    Route::get('reset-password/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetForm'])
+                ->name('password.reset');
+    Route::post('reset-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'resetPassword'])
+                ->name('password.update');
 });
 
 // Routes pour les utilisateurs authentifiés

@@ -15,10 +15,10 @@ class AttributionController extends Controller
 {
     public function index(): View
     {
-        $users = User::where('est_admin', false)->orderBy('name')->get();
-        $places = Place::where('disponible', true)->orderBy('numero')->get();
+        $places = Place::where('est_disponible', true)->orderBy('numero')->get();
+        $users = User::all();
         
-        return view('admin.attribution.index', compact('users', 'places'));
+        return view('admin.attribution.index', compact('places', 'users'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -38,7 +38,7 @@ class AttributionController extends Controller
         }
 
         // Vérifier si la place est disponible
-        if (!$place->disponible) {
+        if (!$place->est_disponible) {
             return back()->with('error', 'Cette place n\'est pas disponible.');
         }
 
@@ -47,11 +47,11 @@ class AttributionController extends Controller
             'user_id' => $user->id,
             'place_id' => $place->id,
             'date_debut' => now(),
-            'date_fin' => now()->addDays($request->duree),
+            'date_fin' => now()->addDays((int)$request->duree),
         ]);
 
         // Mettre à jour le statut de la place
-        $place->update(['disponible' => false]);
+        $place->update(['est_disponible' => false]);
 
         return redirect()->route('admin.attribution.index')
             ->with('success', 'La place a été attribuée avec succès.');
@@ -69,8 +69,8 @@ class AttributionController extends Controller
             'date_fin' => now(),
         ]);
 
-        // Libérer la place
-        $reservation->place->update(['disponible' => true]);
+        // Marquer la place comme disponible à nouveau
+        $reservation->place->update(['est_disponible' => true]);
 
         return back()->with('success', 'La réservation a été terminée avec succès.');
     }

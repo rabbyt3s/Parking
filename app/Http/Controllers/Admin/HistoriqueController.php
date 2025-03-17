@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
+use App\Models\User;
+use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Carbon\Carbon;
 
 class HistoriqueController extends Controller
 {
@@ -13,9 +16,12 @@ class HistoriqueController extends Controller
     {
         $reservations = Reservation::with(['user', 'place'])
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return view('admin.historique.index', compact('reservations'));
+            ->paginate(10);
+        
+        $users = User::all();
+        $places = Place::all();
+        
+        return view('admin.historique.index', compact('reservations', 'users', 'places'));
     }
 
     public function show(Reservation $reservation): View
@@ -26,27 +32,27 @@ class HistoriqueController extends Controller
     public function search(Request $request): View
     {
         $query = Reservation::with(['user', 'place']);
-
+        
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
-
+        
         if ($request->filled('place_id')) {
             $query->where('place_id', $request->place_id);
         }
-
-        if ($request->filled('date_debut')) {
-            $query->whereDate('created_at', '>=', $request->date_debut);
+        
+        if ($request->filled('date')) {
+            $date = Carbon::parse($request->date);
+            $query->whereDate('created_at', $date);
         }
-
-        if ($request->filled('date_fin')) {
-            $query->whereDate('created_at', '<=', $request->date_fin);
-        }
-
+        
         $reservations = $query->orderBy('created_at', 'desc')
-            ->paginate(20)
-            ->withQueryString();
-
-        return view('admin.historique.index', compact('reservations'));
+            ->paginate(10)
+            ->appends($request->all());
+        
+        $users = User::all();
+        $places = Place::all();
+        
+        return view('admin.historique.index', compact('reservations', 'users', 'places'));
     }
 } 

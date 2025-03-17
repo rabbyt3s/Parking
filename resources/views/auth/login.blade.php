@@ -42,9 +42,15 @@
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                             Se connecter
                         </button>
-                        <a href="{{ route('register') }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                            Pas encore inscrit ?
-                        </a>
+                        <div class="text-right">
+                            <a href="{{ route('password.request') }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mb-2">
+                                Mot de passe oublié ?
+                            </a>
+                            <br>
+                            <a href="{{ route('register') }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                                Pas encore inscrit ?
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>

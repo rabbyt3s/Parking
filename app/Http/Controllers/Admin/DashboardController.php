@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $stats = [
             'total_users' => User::where('est_admin', false)->count(),
             'total_places' => Place::count(),
-            'places_disponibles' => Place::where('disponible', true)->count(),
+            'places_disponibles' => Place::where('est_disponible', true)->count(),
             'reservations_actives' => Reservation::where('date_fin', '>', now())->count(),
             'file_attente' => FileAttente::count(),
         ];

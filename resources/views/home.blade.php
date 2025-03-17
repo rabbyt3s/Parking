@@ -56,48 +56,47 @@
         </div>
         
         <!-- Fonctionnalités principales -->
-        <div class="card mb-10">
-            <div class="card-header">
+        <div class="mb-10 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 overflow-hidden">
+            <div class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/50 py-4">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white text-center">Fonctionnalités disponibles</h2>
             </div>
-            <div class="card-body">
-                <ul class="space-y-4 feature-list-centered">
-                    <li class="flex items-start justify-center">
-                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300 text-center">Consultation des places disponibles avec filtres avancés</p>
-                    </li>
-                    <li class="flex items-start justify-center">
-                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300 text-center">Réservation d'une place de parking avec confirmation instantanée</p>
-                    </li>
-                    <li class="flex items-start justify-center">
-                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300 text-center">Inscription sur la file d'attente avec notifications</p>
-                    </li>
-                    @if (auth()->check() && auth()->user()->est_admin)
-                    <li class="flex items-start justify-center">
-                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300 text-center">Administration complète du système et rapports détaillés</p>
-                    </li>
-                    @endif
-                </ul>
-            </div>
+            
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                <li class="py-4 px-6 flex items-center">
+                    <div class="flex-shrink-0 h-6 w-6 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 dark:text-green-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Consultation des places disponibles avec filtres avancés</p>
+                </li>
+                <li class="py-4 px-6 flex items-center">
+                    <div class="flex-shrink-0 h-6 w-6 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 dark:text-green-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Réservation d'une place de parking avec confirmation instantanée</p>
+                </li>
+                <li class="py-4 px-6 flex items-center">
+                    <div class="flex-shrink-0 h-6 w-6 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 dark:text-green-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Inscription sur la file d'attente avec notifications</p>
+                </li>
+                @if (auth()->check() && auth()->user()->est_admin)
+                <li class="py-4 px-6 flex items-center">
+                    <div class="flex-shrink-0 h-6 w-6 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 dark:text-green-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Administration complète du système et rapports détaillés</p>
+                </li>
+                @endif
+            </ul>
         </div>
         
         <!-- Cartes de services -->
@@ -114,7 +113,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">Places disponibles</h3>
                     <p class="text-gray-600 dark:text-gray-400 text-center mb-6">Consultez les places de parking disponibles et leurs caractéristiques en temps réel.</p>
                     <div class="flex justify-center">
-                        <a href="{{ route('places.index') }}" class="btn btn-primary">
+                        <a href="{{ route('places.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:border-primary-700 focus:ring ring-primary-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -136,7 +135,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">Réservations</h3>
                     <p class="text-gray-600 dark:text-gray-400 text-center mb-6">Gérez vos réservations de places de parking et consultez votre historique.</p>
                     <div class="flex justify-center">
-                        <a href="{{ route('reservations.index') }}" class="btn btn-accent">
+                        <a href="{{ route('reservations.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-accent-500 hover:bg-accent-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:border-accent-700 focus:ring ring-accent-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
@@ -157,7 +156,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">File d'attente</h3>
                     <p class="text-gray-600 dark:text-gray-400 text-center mb-6">Inscrivez-vous sur la file d'attente pour obtenir une place dès qu'elle sera disponible.</p>
                     <div class="flex justify-center">
-                        <a href="{{ route('file-attente.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('file-attente.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-600 hover:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:border-gray-700 focus:ring ring-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>

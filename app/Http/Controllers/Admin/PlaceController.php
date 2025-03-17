@@ -39,12 +39,27 @@ class PlaceController extends Controller
         return view('admin.places.edit', compact('place'));
     }
 
+    /**
+     * Affiche les détails d'une place spécifique.
+     */
+    public function show(Place $place): View
+    {
+        // Récupérer l'historique des réservations pour cette place
+        $historiqueReservations = $place->reservations()
+            ->with('user')
+            ->orderBy('date_debut', 'desc')
+            ->take(5)
+            ->get();
+        
+        return view('admin.places.show', compact('place', 'historiqueReservations'));
+    }
+
     public function update(Request $request, Place $place): RedirectResponse
     {
         $request->validate([
             'numero' => 'required|string|unique:places,numero,' . $place->id,
             'description' => 'nullable|string|max:255',
-            'disponible' => 'boolean',
+            'est_disponible' => 'boolean',
         ]);
 
         $place->update($request->all());

@@ -22,6 +22,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/places', [PlaceController::class, 'index'])->name('places.index');
     Route::get('/places/{place}', [PlaceController::class, 'show'])->name('places.show');
     
+    // Routes pour la modification du mot de passe
+    Route::get('/password/change', [App\Http\Controllers\Auth\ChangePasswordController::class, 'showChangeForm'])
+        ->name('password.change.form');
+    Route::post('/password/change', [App\Http\Controllers\Auth\ChangePasswordController::class, 'changePassword'])
+        ->name('password.change');
+    
     // Routes pour les réservations
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
@@ -40,6 +46,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->middleware(CheckAdmin::class)
             ->name('admin.dashboard');
+
+        // Route PUT explicite pour utilisateurs
+        Route::put('/utilisateurs/{utilisateur}', [UtilisateurController::class, 'update'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.utilisateurs.update.explicit');
 
         // Routes pour la gestion des utilisateurs
         Route::resource('utilisateurs', UtilisateurController::class)
@@ -61,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
                 'index' => 'admin.places.index',
                 'create' => 'admin.places.create',
                 'store' => 'admin.places.store',
+                'show' => 'admin.places.show',
                 'edit' => 'admin.places.edit',
                 'update' => 'admin.places.update',
                 'destroy' => 'admin.places.destroy',
@@ -104,6 +116,10 @@ Route::middleware(['auth'])->group(function () {
             ->middleware(CheckAdmin::class)
             ->name('admin.file-attente.destroy');
     });
+
+    // Documentation
+    Route::get('/documentation', [App\Http\Controllers\DocumentationController::class, 'index'])
+        ->name('documentation');
 });
 
 // Ajout d'une route de test pour vérifier si l'utilisateur est admin

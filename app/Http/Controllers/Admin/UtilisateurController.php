@@ -28,7 +28,7 @@ final class UtilisateurController extends Controller
      */
     public function create(): View
     {
-        return view('admin.users.create');
+        return view('admin.utilisateurs.create');
     }
 
     /**
@@ -48,45 +48,45 @@ final class UtilisateurController extends Controller
         
         User::create($validated);
         
-        return redirect()->route('users.index')
+        return redirect()->route('admin.utilisateurs.index')
             ->with('success', 'Utilisateur créé avec succès.');
     }
 
     /**
      * Afficher les détails d'un utilisateur.
      */
-    public function show(User $user): View
+    public function show(User $utilisateur): View
     {
-        return view('admin.users.show', compact('user'));
+        return view('admin.utilisateurs.show', compact('utilisateur'));
     }
 
     /**
      * Afficher le formulaire d'édition d'un utilisateur.
      */
-    public function edit(User $user): View
+    public function edit(User $utilisateur): View
     {
-        return view('admin.utilisateurs.edit', compact('user'));
+        return view('admin.utilisateurs.edit', compact('utilisateur'));
     }
 
     /**
      * Mettre à jour un utilisateur.
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(Request $request, User $utilisateur): RedirectResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $utilisateur->id,
             'est_admin' => 'boolean',
             'est_valide' => 'boolean',
         ]);
 
-        $user->update($request->all());
+        $utilisateur->update($request->all());
         return redirect()->route('admin.utilisateurs.index')->with('success', 'Utilisateur mis à jour avec succès');
     }
 
-    public function resetPassword(User $user)
+    public function resetPassword(User $utilisateur)
     {
-        $user->update([
+        $utilisateur->update([
             'password' => Hash::make('MotDePasseParDefaut123!')
         ]);
         return redirect()->route('admin.utilisateurs.index')->with('success', 'Mot de passe réinitialisé avec succès');
@@ -95,9 +95,9 @@ final class UtilisateurController extends Controller
     /**
      * Supprimer un utilisateur.
      */
-    public function destroy(User $user): RedirectResponse
+    public function destroy(User $utilisateur): RedirectResponse
     {
-        $user->delete();
+        $utilisateur->delete();
         
         return redirect()->route('admin.utilisateurs.index')
             ->with('success', 'Utilisateur supprimé avec succès.');
