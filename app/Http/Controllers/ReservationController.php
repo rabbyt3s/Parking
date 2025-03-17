@@ -6,10 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Place;
 use App\Models\Reservation;
+use App\Models\FileAttente;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 final class ReservationController extends Controller
 {
@@ -28,9 +31,15 @@ final class ReservationController extends Controller
      */
     public function create(): View
     {
-        $places = Place::where('est_disponible', true)->get();
+        // Vérifier si l'utilisateur a déjà une réservation active
+        $hasActiveReservation = Auth::user()->reservations()
+            ->where('est_active', true)
+            ->exists();
+            
+        // Vérifier si l'utilisateur est déjà dans la file d'attente
+        $isInQueue = Auth::user()->fileAttente()->exists();
         
-        return view('reservations.create', compact('places'));
+        return view('reservations.create', compact('hasActiveReservation', 'isInQueue'));
     }
 
     /**
@@ -38,35 +47,64 @@ final class ReservationController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Valider la durée de la réservation
         $validated = $request->validate([
-            'place_id' => 'required|exists:places,id',
-            'date_debut' => 'required|date|after_or_equal:today',
-            'date_fin' => 'required|date|after:date_debut',
+            'duration' => 'required|integer|min:1|max:30',
         ]);
-
-        $place = Place::findOrFail($validated['place_id']);
         
-        // Vérifier si la place est disponible
-        if (!$place->est_disponible) {
-            return back()->withErrors(['place_id' => 'Cette place n\'est plus disponible.']);
+        // Vérifier si l'utilisateur a déjà une réservation active
+        if (Auth::user()->reservations()->where('est_active', true)->exists()) {
+            return back()->withErrors(['message' => 'Vous avez déjà une réservation active.']);
         }
         
-        // Créer la réservation
-        $reservation = new Reservation([
-            'place_id' => $validated['place_id'],
-            'date_debut' => $validated['date_debut'],
-            'date_fin' => $validated['date_fin'],
-            'est_active' => true,
-        ]);
+        // Vérifier si l'utilisateur est déjà dans la file d'attente
+        if (Auth::user()->fileAttente()->exists()) {
+            return back()->withErrors(['message' => 'Vous êtes déjà dans la file d\'attente.']);
+        }
         
-        Auth::user()->reservations()->save($reservation);
+        // Chercher une place disponible aléatoirement
+        $place = Place::where('est_disponible', true)->inRandomOrder()->first();
         
-        // Mettre à jour la disponibilité de la place
-        $place->est_disponible = false;
-        $place->save();
+        // Si aucune place n'est disponible, ajouter l'utilisateur à la file d'attente
+        if (!$place) {
+            // Déterminer la dernière position
+            $lastPosition = FileAttente::max('position') ?? 0;
+            
+            // Créer une nouvelle entrée dans la file d'attente
+            $fileAttente = new FileAttente([
+                'position' => $lastPosition + 1,
+                'date_demande' => now(),
+            ]);
+            
+            Auth::user()->fileAttente()->save($fileAttente);
+            
+            return redirect()->route('file-attente.index')
+                ->with('info', 'Aucune place n\'est disponible actuellement. Vous avez été ajouté à la file d\'attente.');
+        }
+        
+        // Calculer les dates de début et de fin
+        $dateDebut = now();
+        $dateFin = $dateDebut->copy()->addDays($validated['duration']);
+        
+        // Créer la réservation dans une transaction
+        DB::transaction(function () use ($place, $dateDebut, $dateFin) {
+            // Créer la réservation
+            $reservation = new Reservation([
+                'place_id' => $place->id,
+                'date_debut' => $dateDebut,
+                'date_fin' => $dateFin,
+                'est_active' => true,
+            ]);
+            
+            Auth::user()->reservations()->save($reservation);
+            
+            // Mettre à jour la disponibilité de la place
+            $place->est_disponible = false;
+            $place->save();
+        });
         
         return redirect()->route('reservations.index')
-            ->with('success', 'Réservation créée avec succès.');
+            ->with('success', 'La place n°' . $place->numero . ' vous a été attribuée avec succès jusqu\'au ' . $dateFin->format('d/m/Y H:i') . '.');
     }
 
     /**
@@ -120,15 +158,61 @@ final class ReservationController extends Controller
         // Vérifier que l'utilisateur est propriétaire de la réservation
         $this->authorize('delete', $reservation);
         
-        // Libérer la place
-        $place = $reservation->place;
-        $place->est_disponible = true;
-        $place->save();
-        
-        // Supprimer la réservation
-        $reservation->delete();
+        DB::transaction(function () use ($reservation) {
+            // Libérer la place
+            $place = $reservation->place;
+            $place->est_disponible = true;
+            $place->save();
+            
+            // Marquer la réservation comme inactive au lieu de la supprimer
+            $reservation->est_active = false;
+            $reservation->save();
+            
+            // Vérifier s'il y a des personnes dans la file d'attente
+            $firstInQueue = FileAttente::orderBy('position')->first();
+            
+            if ($firstInQueue) {
+                // Attribuer la place à la première personne dans la file d'attente
+                $user = $firstInQueue->user;
+                
+                // Créer une nouvelle réservation pour cet utilisateur
+                $newReservation = new Reservation([
+                    'place_id' => $place->id,
+                    'date_debut' => now(),
+                    'date_fin' => now()->addDays(7), // Durée par défaut de 7 jours
+                    'est_active' => true,
+                ]);
+                
+                $user->reservations()->save($newReservation);
+                
+                // Mettre à jour la disponibilité de la place
+                $place->est_disponible = false;
+                $place->save();
+                
+                // Supprimer l'entrée de la file d'attente
+                $position = $firstInQueue->position;
+                $firstInQueue->delete();
+                
+                // Réorganiser les positions
+                FileAttente::where('position', '>', $position)
+                    ->update(['position' => DB::raw('position - 1')]);
+            }
+        });
         
         return redirect()->route('reservations.index')
             ->with('success', 'Réservation annulée avec succès.');
+    }
+    
+    /**
+     * Afficher l'historique des réservations de l'utilisateur.
+     */
+    public function history(): View
+    {
+        $reservations = Auth::user()->reservations()
+            ->with('place')
+            ->orderBy('date_debut', 'desc')
+            ->get();
+        
+        return view('reservations.history', compact('reservations'));
     }
 }
