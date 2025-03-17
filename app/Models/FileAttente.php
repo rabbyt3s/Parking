@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class Reservation extends Model
+final class FileAttente extends Model
 {
     use HasFactory;
 
@@ -19,10 +19,8 @@ final class Reservation extends Model
      */
     protected $fillable = [
         'user_id',
-        'place_id',
-        'date_debut',
-        'date_fin',
-        'est_active',
+        'position',
+        'date_demande',
     ];
 
     /**
@@ -31,24 +29,14 @@ final class Reservation extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'date_debut' => 'datetime',
-        'date_fin' => 'datetime',
-        'est_active' => 'boolean',
+        'date_demande' => 'datetime',
     ];
 
     /**
-     * Obtenir l'utilisateur qui a fait la réservation.
+     * Obtenir l'utilisateur qui est dans la file d'attente.
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Obtenir la place réservée.
-     */
-    public function place(): BelongsTo
-    {
-        return $this->belongsTo(Place::class);
     }
 }

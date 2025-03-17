@@ -1,65 +1,80 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\FileAttente;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class FileAttenteController extends Controller
+final class FileAttenteController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Afficher la file d'attente.
      */
-    public function index()
+    public function index(): View
     {
-        //
+        $fileAttente = FileAttente::with('user')
+            ->orderBy('position')
+            ->get();
+        
+        $userPosition = Auth::user()->fileAttente;
+        
+        return view('file-attente.index', compact('fileAttente', 'userPosition'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Ajouter l'utilisateur à la file d'attente.
      */
-    public function create()
+    public function store(Request $request): RedirectResponse
     {
-        //
+        // Vérifier si l'utilisateur est déjà dans la file d'attente
+        if (Auth::user()->fileAttente) {
+            return back()->withErrors(['message' => 'Vous êtes déjà dans la file d\'attente.']);
+        }
+        
+        // Déterminer la dernière position
+        $lastPosition = FileAttente::max('position') ?? 0;
+        
+        // Créer une nouvelle entrée dans la file d'attente
+        $fileAttente = new FileAttente([
+            'position' => $lastPosition + 1,
+            'date_demande' => now(),
+        ]);
+        
+        Auth::user()->fileAttente()->save($fileAttente);
+        
+        return redirect()->route('file-attente.index')
+            ->with('success', 'Vous avez été ajouté à la file d\'attente.');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Retirer l'utilisateur de la file d'attente.
      */
-    public function store(Request $request)
+    public function destroy(): RedirectResponse
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(FileAttente $fileAttente)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(FileAttente $fileAttente)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, FileAttente $fileAttente)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(FileAttente $fileAttente)
-    {
-        //
+        $fileAttente = Auth::user()->fileAttente;
+        
+        if (!$fileAttente) {
+            return back()->withErrors(['message' => 'Vous n\'êtes pas dans la file d\'attente.']);
+        }
+        
+        $position = $fileAttente->position;
+        
+        // Supprimer l'entrée de la file d'attente
+        $fileAttente->delete();
+        
+        // Réorganiser les positions
+        DB::transaction(function () use ($position) {
+            FileAttente::where('position', '>', $position)
+                ->update(['position' => DB::raw('position - 1')]);
+        });
+        
+        return redirect()->route('file-attente.index')
+            ->with('success', 'Vous avez été retiré de la file d\'attente.');
     }
 }
