@@ -5,6 +5,10 @@ use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\FileAttenteController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UtilisateurController;
+use App\Http\Controllers\Admin\HistoriqueController;
+use App\Http\Controllers\Admin\AttributionController;
+use App\Http\Controllers\Admin\PlaceController as AdminPlaceController;
 use App\Http\Middleware\CheckAdmin;
 
 // Page d'accueil
@@ -36,6 +40,69 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->middleware(CheckAdmin::class)
             ->name('admin.dashboard');
+
+        // Routes pour la gestion des utilisateurs
+        Route::resource('utilisateurs', UtilisateurController::class)
+            ->middleware(CheckAdmin::class)
+            ->names([
+                'index' => 'admin.utilisateurs.index',
+                'create' => 'admin.utilisateurs.create',
+                'store' => 'admin.utilisateurs.store',
+                'show' => 'admin.utilisateurs.show',
+                'edit' => 'admin.utilisateurs.edit',
+                'update' => 'admin.utilisateurs.update',
+                'destroy' => 'admin.utilisateurs.destroy',
+            ]);
+
+        // Routes pour la gestion des places
+        Route::resource('places', AdminPlaceController::class)
+            ->middleware(CheckAdmin::class)
+            ->names([
+                'index' => 'admin.places.index',
+                'create' => 'admin.places.create',
+                'store' => 'admin.places.store',
+                'edit' => 'admin.places.edit',
+                'update' => 'admin.places.update',
+                'destroy' => 'admin.places.destroy',
+            ]);
+
+        // Route pour la réinitialisation du mot de passe
+        Route::patch('/utilisateurs/{user}/reset-password', [UtilisateurController::class, 'resetPassword'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.utilisateurs.reset-password');
+
+        // Routes pour l'historique des attributions
+        Route::get('/historique', [HistoriqueController::class, 'index'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.historique.index');
+        Route::get('/historique/search', [HistoriqueController::class, 'search'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.historique.search');
+        Route::get('/historique/{reservation}', [HistoriqueController::class, 'show'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.historique.show');
+
+        // Routes pour l'attribution manuelle
+        Route::get('/attribution', [AttributionController::class, 'index'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.attribution.index');
+        Route::post('/attribution', [AttributionController::class, 'store'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.attribution.store');
+        Route::patch('/attribution/{reservation}/terminer', [AttributionController::class, 'terminer'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.attribution.terminer');
+
+        // Routes pour la gestion de la file d'attente
+        Route::get('/file-attente', [FileAttenteController::class, 'index'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.file-attente.index');
+        Route::post('/file-attente', [FileAttenteController::class, 'store'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.file-attente.store');
+        Route::delete('/file-attente/{fileAttente}', [FileAttenteController::class, 'destroy'])
+            ->middleware(CheckAdmin::class)
+            ->name('admin.file-attente.destroy');
     });
 });
 
