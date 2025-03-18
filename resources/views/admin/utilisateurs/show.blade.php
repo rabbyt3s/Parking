@@ -72,6 +72,7 @@
             @endif
             <form action="{{ route('admin.utilisateurs.reset-password', $utilisateur->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur ?');">
                 @csrf
+                @method('PATCH')
                 <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:border-blue-800 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -84,13 +85,7 @@
         <!-- Liste des réservations de l'utilisateur -->
         <div class="mt-8">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Réservations de l'utilisateur</h3>
-            @php
-                $reservations = \App\Models\Reservation::where('user_id', $utilisateur->id)
-                    ->orderBy('created_at', 'desc')
-                    ->limit(5)
-                    ->get();
-            @endphp
-
+            
             @if($reservations->isEmpty())
                 <p class="text-sm text-gray-500 dark:text-gray-400">Aucune réservation trouvée pour cet utilisateur.</p>
             @else

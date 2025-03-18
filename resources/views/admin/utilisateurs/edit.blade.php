@@ -12,7 +12,7 @@
         </a>
     </div>
     <div class="p-6">
-        <form action="{{ route('admin.utilisateurs.update', $utilisateur) }}" method="POST">
+        <form id="editUserForm" action="{{ route('admin.utilisateurs.update', $utilisateur) }}" method="POST" novalidate>
             @csrf
             @method('PUT')
 
@@ -24,6 +24,7 @@
                        value="{{ old('name', $utilisateur->name) }}" 
                        class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 @error('name') border-red-500 dark:border-red-500 @enderror" 
                        required>
+                <span id="name-error" class="text-red-500 text-xs mt-1 hidden">Le nom est requis</span>
                 @error('name')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -37,6 +38,7 @@
                        value="{{ old('email', $utilisateur->email) }}" 
                        class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 @error('email') border-red-500 dark:border-red-500 @enderror" 
                        required>
+                <span id="email-error" class="text-red-500 text-xs mt-1 hidden">Veuillez entrer une adresse email valide</span>
                 @error('email')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -80,4 +82,62 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editUserForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const nameError = document.getElementById('name-error');
+        const emailError = document.getElementById('email-error');
+        
+        // Validation en temps réel
+        nameInput.addEventListener('input', validateName);
+        emailInput.addEventListener('input', validateEmail);
+        
+        // Validation à la soumission
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            
+            if (!validateName()) {
+                isValid = false;
+            }
+            
+            if (!validateEmail()) {
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+        
+        function validateName() {
+            if (nameInput.value.trim() === '') {
+                nameInput.classList.add('border-red-500');
+                nameError.classList.remove('hidden');
+                return false;
+            } else {
+                nameInput.classList.remove('border-red-500');
+                nameError.classList.add('hidden');
+                return true;
+            }
+        }
+        
+        function validateEmail() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value.trim())) {
+                emailInput.classList.add('border-red-500');
+                emailError.classList.remove('hidden');
+                return false;
+            } else {
+                emailInput.classList.remove('border-red-500');
+                emailError.classList.add('hidden');
+                return true;
+            }
+        }
+    });
+</script>
+@endpush
 @endsection 

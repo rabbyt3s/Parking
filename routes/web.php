@@ -17,8 +17,24 @@ Route::get('/', function () {
 });
 
 // Routes pour l'authentification
+Route::middleware(['web', 'throttle:auth'])->group(function () {
+    Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+    Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+    Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
+});
+
+// Routes pour la réinitialisation de mot de passe
+Route::middleware(['web', 'throttle:password'])->group(function () {
+    Route::get('/password/reset', [App\Http\Controllers\Auth\PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/password/email', [App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/password/reset/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/password/reset', [App\Http\Controllers\Auth\PasswordResetController::class, 'reset'])->name('password.update');
+});
+
+// Routes pour les places
 Route::middleware(['auth'])->group(function () {
-    // Routes pour les places
     Route::get('/places', [PlaceController::class, 'index'])->name('places.index');
     Route::get('/places/{place}', [PlaceController::class, 'show'])->name('places.show');
     
@@ -120,6 +136,12 @@ Route::middleware(['auth'])->group(function () {
     // Documentation
     Route::get('/documentation', [App\Http\Controllers\DocumentationController::class, 'index'])
         ->name('documentation');
+
+    // Routes pour le changement de mot de passe forcé
+    Route::get('/force-password-change', [App\Http\Controllers\Auth\ForcePasswordChangeController::class, 'showChangeForm'])
+        ->name('password.force.change');
+    Route::post('/force-password-change', [App\Http\Controllers\Auth\ForcePasswordChangeController::class, 'update'])
+        ->name('password.force.update');
 });
 
 // Ajout d'une route de test pour vérifier si l'utilisateur est admin

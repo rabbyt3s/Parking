@@ -26,6 +26,7 @@ final class User extends Authenticatable
         'password',
         'est_admin',
         'est_valide',
+        'force_password_change',
     ];
 
     /**
@@ -48,6 +49,7 @@ final class User extends Authenticatable
         'password' => 'hashed',
         'est_admin' => 'boolean',
         'est_valide' => 'boolean',
+        'force_password_change' => 'boolean',
     ];
 
     /**
