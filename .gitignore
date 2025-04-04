@@ -1,23 +1,79 @@
-/.phpunit.cache
+# Dependencies
 /node_modules
+/vendor
+
+# Laravel specific
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
-/storage/pail
-/vendor
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/app/*
+/bootstrap/cache/*
+
+# Keep .gitkeep files
+!/storage/framework/cache/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/views/.gitkeep
+!/storage/logs/.gitkeep
+!/storage/app/.gitkeep
+!/storage/app/public/.gitkeep
+!/bootstrap/cache/.gitkeep
+
+# Environment files
 .env
-.env.backup
+.env*.backup
 .env.production
-.phpactor.json
+.envZone.Identifier
+
+# Database
+/database/*.sqlite
+/database/*.sqlite-journal
+/database/database.sqlite
+
+# Testing
+/.phpunit.cache
 .phpunit.result.cache
+
+# IDEs and editors
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed
+*.sublime-project
+*.sublime-workspace
+.phpactor.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Build tools
+/public/css
+/public/js
+/public/mix-manifest.json
+
+# Composer
+auth.json
+composer.phar
+
+# Local development
 Homestead.json
 Homestead.yaml
-npm-debug.log
-yarn-error.log
-/auth.json
-/.fleet
-/.idea
-/.nova
-/.vscode
-/.zed
+docker-compose.override.yml
+
+# Application specific
+an tinker
+script de création de db.txt

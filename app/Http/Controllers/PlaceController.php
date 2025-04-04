@@ -7,6 +7,7 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 
 final class PlaceController extends Controller
 {
@@ -50,5 +51,23 @@ final class PlaceController extends Controller
             ->get();
         
         return view('places.show', compact('place', 'historiqueReservations'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'numero' => 'required|string|unique:places,numero',
+            'description' => 'nullable|string|max:255',
+            'est_disponible' => 'boolean',
+        ]);
+
+        // Si est_disponible n'est pas dans la requête, on le met à true par défaut
+        $validated['est_disponible'] = $request->has('est_disponible');
+
+        Place::create($validated);
+
+        return redirect()
+            ->route('admin.places.index')
+            ->with('success', 'Place créée avec succès.');
     }
 }
